@@ -17,7 +17,7 @@ class MagicTest(unittest.TestCase):
             except TypeError:
                 filename = os.path.join(self.TESTDATA_DIR.encode('utf-8'), filename)
 
-            
+
             if type(expected_value) is not tuple:
                 expected_value = (expected_value,)
 
@@ -37,7 +37,13 @@ class MagicTest(unittest.TestCase):
         self.assertEqual("text/x-python", m.from_buffer(s))
         b = b'#!/usr/bin/env python\nprint("foo")'
         self.assertEqual("text/x-python", m.from_buffer(b))
-                
+
+
+    def test_open_file(self):
+        m = magic.Magic(mime=True)
+        with open(os.path.join(self.TESTDATA_DIR, "test.pdf")) as f:
+            self.assertEqual("application/pdf", m.from_open_file(f))
+
     def test_mime_types(self):
         dest = os.path.join(MagicTest.TESTDATA_DIR, b'\xce\xbb'.decode('utf-8'))
         shutil.copyfile(os.path.join(MagicTest.TESTDATA_DIR, 'lambda'), dest)
@@ -92,7 +98,7 @@ class MagicTest(unittest.TestCase):
 
         m = magic.Magic(mime=True)
         self.assertEqual(m.from_file(filename), 'image/jpeg')
-        
+
         m = magic.Magic(mime=True, keep_going=True)
         self.assertEqual(m.from_file(filename), 'image/jpeg')
 
@@ -103,7 +109,7 @@ class MagicTest(unittest.TestCase):
             def t(x,y):
                 raise magic.MagicException("passthrough")
             magic.magic_buffer = t
-            
+
             self.assertRaises(magic.MagicException, magic.from_buffer, "hello", True)
         finally:
             magic.magic_buffer = old
